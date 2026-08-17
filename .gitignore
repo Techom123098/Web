@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# IDE internal folders (tidak perlu di GitHub)
+.claude/
+.windsurf/
+.agents/
+
+# Environment variables (JANGAN PERNAH DICOMMIT!)
+.env
+.env.local
+.env.production
+.env*.local
+
+# Database lokal (sudah diganti Supabase, tidak perlu)
+*.db
+prisma/dev.db
+prisma/*.db
+
+# Uploads lokal (gambar sudah di Cloudinary)
+uploads/
+
+# Build output
+dist/
+.dist/
+
+# Prisma generated
+/generated/prisma
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.log

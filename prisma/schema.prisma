@@ -1,0 +1,38 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  username String   @unique
+  password String
+  role     String   @default("admin")
+  createdAt DateTime @default(now())
+}
+
+model Employee {
+  id        Int      @id @default(autoincrement())
+  name      String
+  position  String
+  contact   String?
+  createdAt DateTime @default(now())
+}
+
+model Product {
+  id             Int      @id @default(autoincrement())
+  name           String
+  description    String?  // Map to "Penjelasan Produk"
+  advantages     String?  // Map to "Keunggulan"
+  specs          String?  // Map to "Spesifikasi" (only for Laptop)
+  laptopCategory String?  // "Pelajar", "Kantoran", "Gaming" (only for Laptop)
+  price          Float?   // Optional price
+  imageUrl       String?
+  type           String   @default("Laptop") // "Laptop", "PC", "SSD_RAM", "CCTV"
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}

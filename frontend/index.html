@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="TechHaven - Toko Komputer Terpercaya. Laptop, PC, SSD, RAM, dan CCTV berkualitas dengan harga terbaik.">
+    <title>TechHaven - Toko Komputer Terpercaya</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/src/style.css">
+  </head>
+  <body>
+
+    <!-- Custom cursor -->
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+
+    <!-- Page intro overlay -->
+    <div class="page-intro" id="pageIntro">
+      <div class="intro-logo">Tech<span>Haven</span></div>
+      <div class="intro-tagline">Toko Komputer Terpercaya</div>
+      <div class="intro-bar"></div>
+    </div>
+
+    <!-- NAVBAR -->
+    <header class="navbar" id="navbar">
+      <div class="nav-brand">
+        <div class="logo-mark">TH</div>
+        <span class="logo-text">Tech<span class="logo-accent">Haven</span></span>
+      </div>
+
+      <div class="nav-search">
+        <div class="search-wrapper">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input type="text" id="searchInput" placeholder="Cari produk, merek, tipe...">
+          <button id="searchBtn">Cari</button>
+        </div>
+      </div>
+
+      <nav class="nav-right">
+        <a href="#catalog" class="nav-link">Katalog</a>
+        <a href="#contact-section" class="nav-link">Kontak</a>
+      </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero-section" id="hero">
+      <div class="hero-content">
+        <div class="hero-badge-pill">✨ Terpercaya sejak 2020</div>
+        <h1 class="hero-title">Temukan <em>Teknologi</em><br>Terbaik untuk Anda</h1>
+        <p class="hero-subtitle">Laptop, PC Desktop, SSD & RAM, hingga CCTV — semua tersedia dengan harga terbaik dan garansi resmi.</p>
+        <div class="hero-cta-row">
+          <a href="#catalog" class="btn-cta-primary">Lihat Katalog</a>
+          <a href="https://wa.me/6281234567890" target="_blank" class="btn-cta-secondary">💬 Hubungi Kami</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-floating-card card-1">
+          <img class="float-img" src="/hero_laptop.jpg" alt="Laptop Gaming">
+          <span>Laptop Gaming</span>
+        </div>
+        <div class="hero-floating-card card-2">
+          <img class="float-img" src="/hero_pc.jpg" alt="PC Desktop">
+          <span>PC Desktop</span>
+        </div>
+        <div class="hero-floating-card card-3">
+          <img class="float-img" src="/hero_ssd.jpg" alt="SSD & RAM">
+          <span>SSD & RAM</span>
+        </div>
+        <div class="hero-circle"></div>
+      </div>
+    </section>
+
+    <!-- CATEGORY BAR -->
+    <section class="category-section" id="catalog">
+      <div class="category-label">Kategori Produk</div>
+      <div class="category-pills" id="categoryList">
+        <button class="cat-pill active" onclick="loadProducts()">
+          <span class="cat-emoji">📦</span> Semua
+        </button>
+        <button class="cat-pill" onclick="loadProducts('Laptop')">
+          <span class="cat-emoji">💻</span> Laptop
+        </button>
+        <button class="cat-pill" onclick="loadProducts('PC')">
+          <span class="cat-emoji">🖥️</span> PC Desktop
+        </button>
+        <button class="cat-pill" onclick="loadProducts('SSD & RAM')">
+          <span class="cat-emoji">💾</span> SSD & RAM
+        </button>
+        <button class="cat-pill" onclick="loadProducts('CCTV')">
+          <span class="cat-emoji">📷</span> CCTV
+        </button>
+      </div>
+    </section>
+
+    <!-- PRODUCT GRID -->
+    <main class="products-section">
+      <div class="section-title-row">
+        <h2 class="section-title" id="sectionTitle">Semua Produk</h2>
+        <div class="product-count" id="productCount"></div>
+      </div>
+      <div class="product-grid" id="productGrid">
+        <div class="loading-state">
+          <div class="spinner"></div>
+          <p>Memuat produk...</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- CONTACT SECTION -->
+    <section class="contact-section" id="contact-section">
+      <div class="contact-inner">
+        <div class="contact-left">
+          <h2>Hubungi <span>Kami</span></h2>
+          <p>Ada pertanyaan tentang produk? Tim kami siap membantu Anda menemukan produk yang tepat.</p>
+        </div>
+        <div class="contact-cards">
+          <a href="https://wa.me/6281234567890" target="_blank" class="contact-card wa">
+            <div class="contact-card-icon">💬</div>
+            <div class="contact-card-label">WhatsApp</div>
+            <div class="contact-card-sub">Chat langsung</div>
+          </a>
+          <a href="#" class="contact-card ig">
+            <div class="contact-card-icon">📸</div>
+            <div class="contact-card-label">Instagram</div>
+            <div class="contact-card-sub">@techhaven.id</div>
+          </a>
+          <a href="#" class="contact-card tt">
+            <div class="contact-card-icon">🎵</div>
+            <div class="contact-card-label">TikTok</div>
+            <div class="contact-card-sub">@techhaven</div>
+          </a>
+          <a href="#" class="contact-card sp">
+            <div class="contact-card-icon">🛍️</div>
+            <div class="contact-card-label">Shopee</div>
+            <div class="contact-card-sub">TechHaven Store</div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-logo">Tech<span>Haven</span></div>
+        <p class="footer-tagline">Toko Komputer Terpercaya • Garansi Resmi</p>
+        <p class="footer-copy">© 2024 TechHaven. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <!-- PRODUCT DETAIL MODAL -->
+    <div class="product-modal" id="productModal">
+      <div class="product-modal-backdrop" id="modalBackdrop"></div>
+      <div class="product-modal-content" id="modalContent">
+        <button class="modal-close-btn" id="modalCloseBtn">✕</button>
+        <div id="modalBody"></div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
