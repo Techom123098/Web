@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api';
+const API_URL = '/api';
 let token = localStorage.getItem('adminToken');
 let currentProductType = '';
 let editingProductId = null; // null = mode tambah, ada id = mode edit
