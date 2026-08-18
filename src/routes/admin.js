@@ -1,13 +1,10 @@
 const express = require('express');
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../db');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
 const cloudinary = require('cloudinary').v2;
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
 // ── Konfigurasi Cloudinary ─────────────────────────────────────────────────
 cloudinary.config({
@@ -16,20 +13,10 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// ── Multer: simpan sementara ke disk, lalu coba upload ke Cloudinary ───────
-const uploadsDir = path.join(__dirname, '../../uploads');
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-
-const localStorage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadsDir),
-  filename: (req, file, cb) => {
-    const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e6) + path.extname(file.originalname);
-    cb(null, uniqueName);
-  }
-});
-
+// ── Multer: simpan di memory (serverless & cloud friendly) ─────────────────
+const storage = multer.memoryStorage();
 const upload = multer({
-  storage: localStorage,
+  storage,
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
@@ -38,19 +25,20 @@ const upload = multer({
   }
 });
 
-// Helper: upload ke Cloudinary dengan timeout
-async function tryCloudinaryUpload(filePath) {
+// Helper: upload buffer ke Cloudinary
+function uploadBufferToCloudinary(buffer) {
   return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      reject(new Error('Cloudinary timeout (10 detik)'));
-    }, 10000);
-
-    cloudinary.uploader.upload(filePath, {
-      folder: 'computer-store/products',
-      transformation: [{ width: 1200, height: 900, crop: 'limit', quality: 'auto' }],
-    })
-    .then(result => { clearTimeout(timeout); resolve(result); })
-    .catch(err => { clearTimeout(timeout); reject(err); });
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: 'computer-store/products',
+        transformation: [{ width: 1200, height: 900, crop: 'limit', quality: 'auto' }],
+      },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    );
+    stream.end(buffer);
   });
 }
 
@@ -68,6 +56,7 @@ router.get('/dashboard', async (req, res) => {
     const cctv = await prisma.product.count({ where: { type: 'CCTV' } });
     res.json({ totalProducts, totalEmployees, laptops, pcs, ssdRam, cctv });
   } catch (error) {
+    console.error('Dashboard stats error:', error);
     res.status(500).json({ error: 'Failed to fetch dashboard stats' });
   }
 });
@@ -78,6 +67,7 @@ router.get('/employees', async (req, res) => {
     const employees = await prisma.employee.findMany({ orderBy: { createdAt: 'desc' } });
     res.json(employees);
   } catch (error) {
+    console.error('Get employees error:', error);
     res.status(500).json({ error: 'Failed to fetch employees' });
   }
 });
@@ -90,6 +80,7 @@ router.post('/employees', async (req, res) => {
     });
     res.json(employee);
   } catch (error) {
+    console.error('Create employee error:', error);
     res.status(500).json({ error: 'Failed to create employee' });
   }
 });
@@ -99,6 +90,7 @@ router.delete('/employees/:id', async (req, res) => {
     await prisma.employee.delete({ where: { id: parseInt(req.params.id) } });
     res.json({ message: 'Employee deleted' });
   } catch (error) {
+    console.error('Delete employee error:', error);
     res.status(500).json({ error: 'Failed to delete employee' });
   }
 });
@@ -112,37 +104,20 @@ router.put('/employees/:id', async (req, res) => {
     });
     res.json(employee);
   } catch (error) {
+    console.error('Update employee error:', error);
     res.status(500).json({ error: 'Failed to update employee' });
   }
 });
 
 // ── Product Management ─────────────────────────────────────────────────────
 
-// Upload gambar: coba Cloudinary dulu, fallback ke lokal
+// Upload gambar ke Cloudinary via stream buffer
 router.post('/products/upload', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
 
-    const localPath = req.file.path;
-    const localUrl = `/uploads/${req.file.filename}`;
-    let imageUrl = `http://localhost:${process.env.PORT || 3000}${localUrl}`;
-    let source = 'local';
-
-    // Coba upload ke Cloudinary (dengan timeout 10 detik)
-    try {
-      const result = await tryCloudinaryUpload(localPath);
-      imageUrl = result.secure_url;
-      source = 'cloudinary';
-      // Hapus file lokal karena sudah di Cloudinary
-      fs.unlink(localPath, () => {});
-      console.log('✅ Upload ke Cloudinary berhasil:', imageUrl);
-    } catch (cloudErr) {
-      // Cloudinary gagal — pakai file lokal
-      console.warn('⚠️ Cloudinary gagal, pakai upload lokal:', cloudErr.message);
-      console.log('📁 Gambar disimpan lokal:', imageUrl);
-    }
-
-    res.json({ imageUrl, source });
+    const result = await uploadBufferToCloudinary(req.file.buffer);
+    res.json({ imageUrl: result.secure_url, source: 'cloudinary' });
   } catch (error) {
     console.error('Upload error:', error.message || error);
     res.status(500).json({ error: 'Failed to upload image', details: error.message });
@@ -166,25 +141,13 @@ router.put('/products/:id', async (req, res) => {
   try {
     const { name, description, advantages, specs, laptopCategory, price, imageUrl, type } = req.body;
 
-    // Jika ada gambar baru, coba hapus gambar lama dari Cloudinary
     if (imageUrl) {
       const existing = await prisma.product.findUnique({ where: { id: parseInt(req.params.id) } });
-      if (existing?.imageUrl && existing.imageUrl !== imageUrl) {
-        // Hapus dari Cloudinary jika URL-nya Cloudinary
-        if (existing.imageUrl.includes('cloudinary.com')) {
-          const urlParts = existing.imageUrl.split('/');
-          const filename = urlParts[urlParts.length - 1].split('.')[0];
-          const publicId = `computer-store/products/${filename}`;
-          try { await cloudinary.uploader.destroy(publicId); } catch (e) { /* abaikan */ }
-        }
-        // Hapus file lokal jika URL-nya lokal
-        if (existing.imageUrl.includes('/uploads/')) {
-          const localFilename = existing.imageUrl.split('/uploads/')[1];
-          if (localFilename) {
-            const localPath = path.join(uploadsDir, localFilename);
-            fs.unlink(localPath, () => {});
-          }
-        }
+      if (existing?.imageUrl && existing.imageUrl !== imageUrl && existing.imageUrl.includes('cloudinary.com')) {
+        const urlParts = existing.imageUrl.split('/');
+        const filename = urlParts[urlParts.length - 1].split('.')[0];
+        const publicId = `computer-store/products/${filename}`;
+        try { await cloudinary.uploader.destroy(publicId); } catch (e) { /* ignore */ }
       }
     }
 
@@ -194,39 +157,32 @@ router.put('/products/:id', async (req, res) => {
     });
     res.json(product);
   } catch (error) {
+    console.error('Update product error:', error);
     res.status(500).json({ error: 'Failed to update product' });
   }
 });
-
 
 router.delete('/products/:id', async (req, res) => {
   try {
     const product = await prisma.product.findUnique({ where: { id: parseInt(req.params.id) } });
 
-    if (product?.imageUrl) {
-      // Hapus dari Cloudinary jika URL-nya Cloudinary
-      if (product.imageUrl.includes('cloudinary.com')) {
-        const urlParts = product.imageUrl.split('/');
-        const filename = urlParts[urlParts.length - 1].split('.')[0];
-        const publicId = `computer-store/products/${filename}`;
-        try { await cloudinary.uploader.destroy(publicId); } catch (e) { /* abaikan */ }
-      }
-      // Hapus file lokal jika URL-nya lokal
-      if (product.imageUrl.includes('/uploads/')) {
-        const localFilename = product.imageUrl.split('/uploads/')[1];
-        if (localFilename) {
-          const localPath = path.join(uploadsDir, localFilename);
-          fs.unlink(localPath, () => {});
-        }
+    if (product?.imageUrl && product.imageUrl.includes('cloudinary.com')) {
+      const urlParts = product.imageUrl.split('/');
+      const filename = urlParts[urlParts.length - 1].split('.')[0];
+      const publicId = `computer-store/products/${filename}`;
+      try {
+        await cloudinary.uploader.destroy(publicId);
+      } catch (cloudErr) {
+        console.warn('Cloudinary delete warning:', cloudErr.message);
       }
     }
 
     await prisma.product.delete({ where: { id: parseInt(req.params.id) } });
     res.json({ message: 'Product deleted' });
   } catch (error) {
+    console.error('Delete product error:', error);
     res.status(500).json({ error: 'Failed to delete product' });
   }
 });
 
 module.exports = router;
-
