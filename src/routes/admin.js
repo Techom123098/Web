@@ -2,8 +2,9 @@ const express = require('express');
 const { PrismaClient } = require('@prisma/client');
 const { authenticateToken, requireAdmin } = require('../middleware/auth');
 const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -15,16 +16,43 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Multer pakai Cloudinary storage (upload langsung ke cloud)
-const storage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: 'computer-store/products', // nama folder di Cloudinary
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
-    transformation: [{ width: 1200, height: 900, crop: 'limit', quality: 'auto' }],
-  },
+// ── Multer: simpan sementara ke disk, lalu coba upload ke Cloudinary ───────
+const uploadsDir = path.join(__dirname, '../../uploads');
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+
+const localStorage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadsDir),
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e6) + path.extname(file.originalname);
+    cb(null, uniqueName);
+  }
 });
-const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
+
+const upload = multer({
+  storage: localStorage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+    if (allowed.includes(file.mimetype)) cb(null, true);
+    else cb(new Error('Format gambar tidak didukung. Gunakan JPG, PNG, atau WEBP.'));
+  }
+});
+
+// Helper: upload ke Cloudinary dengan timeout
+async function tryCloudinaryUpload(filePath) {
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error('Cloudinary timeout (10 detik)'));
+    }, 10000);
+
+    cloudinary.uploader.upload(filePath, {
+      folder: 'computer-store/products',
+      transformation: [{ width: 1200, height: 900, crop: 'limit', quality: 'auto' }],
+    })
+    .then(result => { clearTimeout(timeout); resolve(result); })
+    .catch(err => { clearTimeout(timeout); reject(err); });
+  });
+}
 
 router.use(authenticateToken);
 router.use(requireAdmin);
@@ -88,16 +116,36 @@ router.put('/employees/:id', async (req, res) => {
   }
 });
 
-// Product Management - Upload Image ke Cloudinary
+// ── Product Management ─────────────────────────────────────────────────────
+
+// Upload gambar: coba Cloudinary dulu, fallback ke lokal
 router.post('/products/upload', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-    // URL gambar sudah otomatis dari Cloudinary
-    const imageUrl = req.file.path;
-    res.json({ imageUrl });
+
+    const localPath = req.file.path;
+    const localUrl = `/uploads/${req.file.filename}`;
+    let imageUrl = `http://localhost:${process.env.PORT || 3000}${localUrl}`;
+    let source = 'local';
+
+    // Coba upload ke Cloudinary (dengan timeout 10 detik)
+    try {
+      const result = await tryCloudinaryUpload(localPath);
+      imageUrl = result.secure_url;
+      source = 'cloudinary';
+      // Hapus file lokal karena sudah di Cloudinary
+      fs.unlink(localPath, () => {});
+      console.log('✅ Upload ke Cloudinary berhasil:', imageUrl);
+    } catch (cloudErr) {
+      // Cloudinary gagal — pakai file lokal
+      console.warn('⚠️ Cloudinary gagal, pakai upload lokal:', cloudErr.message);
+      console.log('📁 Gambar disimpan lokal:', imageUrl);
+    }
+
+    res.json({ imageUrl, source });
   } catch (error) {
-    console.error('Upload error:', error);
-    res.status(500).json({ error: 'Failed to upload image' });
+    console.error('Upload error:', error.message || error);
+    res.status(500).json({ error: 'Failed to upload image', details: error.message });
   }
 });
 
@@ -109,7 +157,8 @@ router.post('/products', async (req, res) => {
     });
     res.json(product);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to create product' });
+    console.error('Create product error:', error.message || error);
+    res.status(500).json({ error: 'Failed to create product', details: error.message });
   }
 });
 
@@ -117,14 +166,25 @@ router.put('/products/:id', async (req, res) => {
   try {
     const { name, description, advantages, specs, laptopCategory, price, imageUrl, type } = req.body;
 
-    // Jika ada gambar baru, hapus gambar lama dari Cloudinary
+    // Jika ada gambar baru, coba hapus gambar lama dari Cloudinary
     if (imageUrl) {
       const existing = await prisma.product.findUnique({ where: { id: parseInt(req.params.id) } });
       if (existing?.imageUrl && existing.imageUrl !== imageUrl) {
-        const urlParts = existing.imageUrl.split('/');
-        const filename = urlParts[urlParts.length - 1].split('.')[0];
-        const publicId = `computer-store/products/${filename}`;
-        try { await cloudinary.uploader.destroy(publicId); } catch (e) { /* abaikan jika gagal */ }
+        // Hapus dari Cloudinary jika URL-nya Cloudinary
+        if (existing.imageUrl.includes('cloudinary.com')) {
+          const urlParts = existing.imageUrl.split('/');
+          const filename = urlParts[urlParts.length - 1].split('.')[0];
+          const publicId = `computer-store/products/${filename}`;
+          try { await cloudinary.uploader.destroy(publicId); } catch (e) { /* abaikan */ }
+        }
+        // Hapus file lokal jika URL-nya lokal
+        if (existing.imageUrl.includes('/uploads/')) {
+          const localFilename = existing.imageUrl.split('/uploads/')[1];
+          if (localFilename) {
+            const localPath = path.join(uploadsDir, localFilename);
+            fs.unlink(localPath, () => {});
+          }
+        }
       }
     }
 
@@ -143,16 +203,21 @@ router.delete('/products/:id', async (req, res) => {
   try {
     const product = await prisma.product.findUnique({ where: { id: parseInt(req.params.id) } });
 
-    // Hapus gambar dari Cloudinary jika ada
     if (product?.imageUrl) {
-      // Ambil public_id dari URL Cloudinary (format: .../computer-store/products/namafile)
-      const urlParts = product.imageUrl.split('/');
-      const filename = urlParts[urlParts.length - 1].split('.')[0]; // tanpa ekstensi
-      const publicId = `computer-store/products/${filename}`;
-      try {
-        await cloudinary.uploader.destroy(publicId);
-      } catch (cloudErr) {
-        console.warn('Cloudinary delete warning:', cloudErr.message);
+      // Hapus dari Cloudinary jika URL-nya Cloudinary
+      if (product.imageUrl.includes('cloudinary.com')) {
+        const urlParts = product.imageUrl.split('/');
+        const filename = urlParts[urlParts.length - 1].split('.')[0];
+        const publicId = `computer-store/products/${filename}`;
+        try { await cloudinary.uploader.destroy(publicId); } catch (e) { /* abaikan */ }
+      }
+      // Hapus file lokal jika URL-nya lokal
+      if (product.imageUrl.includes('/uploads/')) {
+        const localFilename = product.imageUrl.split('/uploads/')[1];
+        if (localFilename) {
+          const localPath = path.join(uploadsDir, localFilename);
+          fs.unlink(localPath, () => {});
+        }
       }
     }
 
@@ -164,3 +229,4 @@ router.delete('/products/:id', async (req, res) => {
 });
 
 module.exports = router;
+
