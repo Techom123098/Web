@@ -1,243 +1,272 @@
 <!doctype html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="TechHaven - Toko Komputer Terpercaya, Laptop, PC, SSD, RAM, dan CCTV berkualitas.">
-    <title>TechHaven - Admin Panel</title>
-    <link rel="stylesheet" href="/src/style.css">
-  </head>
-  <body class="admin-body">
 
-    <!-- ===== LOGIN ===== -->
-    <div id="loginSection" class="auth-container">
-      <div class="auth-box">
-        <div class="auth-logo">Tech<span style="color:var(--green);">Haven</span></div>
-        <h2>Login Admin</h2>
-        <input type="text" id="username" placeholder="Username" autocomplete="username">
-        <input type="password" id="password" placeholder="Password" autocomplete="current-password">
-        <button class="btn-login" id="loginBtn">Masuk</button>
-        <div id="loginError" class="error-msg"></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="TechHaven - Toko Komputer Terpercaya, Laptop, PC, SSD, RAM, dan CCTV berkualitas.">
+  <title>TechHaven - Admin Panel</title>
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+
+<body class="admin-body">
+
+  <!-- ===== LOGIN ===== -->
+  <div id="loginSection" class="auth-container">
+    <div class="auth-box">
+      <div class="auth-logo">Tech<span style="color:var(--green);">Haven</span></div>
+      <h2>Login Admin</h2>
+      <input type="text" id="username" placeholder="Username" autocomplete="username">
+      <input type="password" id="password" placeholder="Password" autocomplete="current-password">
+      <button class="btn-login" id="loginBtn">Masuk</button>
+      <div id="loginError" class="error-msg"></div>
+    </div>
+  </div>
+
+  <!-- ===== DASHBOARD ===== -->
+  <!-- Overlay untuk mobile sidebar (di luar grid agar tidak merusak layout) -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div id="dashboardSection" class="dashboard-container" style="display:none;">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar no-print">
+      <div class="admin-sidebar-header">
+        <div class="brand">Tech<span>Haven</span></div>
+        <p>Admin Panel</p>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="#" id="navDashboard" class="active"><span class="icon"></span>Dashboard</a></li>
+          <div class="nav-section-label">Data Produk</div>
+          <li><a href="#" id="navLaptop"><span class="icon"></span>Data Laptop</a></li>
+          <li><a href="#" id="navPC"><span class="icon"></span>Data PC</a></li>
+          <li><a href="#" id="navSSD"><span class="icon"></span>Data SSD & RAM</a></li>
+          <li><a href="#" id="navCCTV"><span class="icon"></span>Data CCTV</a></li>
+          <div class="nav-section-label">SDM</div>
+          <li><a href="#" id="navEmployees"><span class="icon"></span>Data Karyawan</a></li>
+        </ul>
+      </nav>
+      <div class="admin-sidebar-footer">
+        <a href="#" id="navLogout"> Keluar</a>
+      </div>
+    </aside>
+
+
+
+    <!-- MAIN CONTENT -->
+    <main class="admin-content">
+      <div class="admin-topbar no-print">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <button class="hamburger-btn" id="hamburgerBtn" aria-label="Buka menu">
+            <span></span><span></span><span></span>
+          </button>
+          <h1 id="pageTitle">Dashboard</h1>
+        </div>
+        <span id="adminUser" style="font-size:0.85rem;color:var(--gray-500);">Admin</span>
+      </div>
+
+      <div class="admin-main">
+
+        <!-- DASHBOARD VIEW -->
+        <div id="viewDashboard">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-card-icon blue"></div>
+              <div class="stat-card-info">
+                <h4>Laptop</h4>
+                <p id="statLaptop">-</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-icon blue"></div>
+              <div class="stat-card-info">
+                <h4>PC Desktop</h4>
+                <p id="statPC">-</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-icon green"></div>
+              <div class="stat-card-info">
+                <h4>SSD & RAM</h4>
+                <p id="statSSD">-</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-icon dark"></div>
+              <div class="stat-card-info">
+                <h4>CCTV</h4>
+                <p id="statCCTV">-</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-icon green"></div>
+              <div class="stat-card-info">
+                <h4>Total Produk</h4>
+                <p id="statProducts">-</p>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-icon dark"></div>
+              <div class="stat-card-info">
+                <h4>Karyawan</h4>
+                <p id="statEmployees">-</p>
+              </div>
+            </div>
+          </div>
+          <div
+            style="background:var(--white);border:1px solid var(--border);border-radius:12px;padding:2rem;text-align:center;color:var(--gray);">
+            <p style="font-size:1.5rem;margin-bottom:0.5rem;"></p>
+            <p>Selamat datang di Admin Panel TechHaven. Pilih menu di sebelah kiri untuk mengelola data.</p>
+          </div>
+        </div>
+
+        <!-- PRODUCTS VIEW -->
+        <div id="viewProducts" style="display:none;" class="printable">
+          <div class="print-header">
+            <h2 id="printTitleProducts">Laporan Data Produk</h2>
+            <p>TechHaven - Dicetak pada: <span id="printDate"></span></p>
+          </div>
+          <div class="view-section">
+            <div class="view-toolbar no-print">
+              <h3 id="productTableTitle">Data Produk</h3>
+              <div class="view-toolbar-actions">
+                <button class="btn btn-primary" id="addProductBtn"> Tambah Data</button>
+                <button class="btn btn-dark no-print" id="printProductsBtn"> Cetak</button>
+              </div>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr id="productsTableHeader"></tr>
+              </thead>
+              <tbody id="productsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- EMPLOYEES VIEW -->
+        <div id="viewEmployees" style="display:none;" class="printable">
+          <div class="print-header">
+            <h2>Laporan Data Karyawan</h2>
+            <p>TechHaven - Dicetak pada: <span id="printDateEmp"></span></p>
+          </div>
+          <div class="view-section">
+            <div class="view-toolbar no-print">
+              <h3>Data Karyawan</h3>
+              <div class="view-toolbar-actions">
+                <button class="btn btn-primary" id="addEmployeeBtn"> Tambah Karyawan</button>
+                <button class="btn btn-dark no-print" id="printEmployeesBtn"> Cetak</button>
+              </div>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Nama Karyawan</th>
+                  <th>Posisi / Jabatan</th>
+                  <th>Kontak (WhatsApp)</th>
+                  <th class="no-print">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="employeesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- end admin-main -->
+    </main>
+  </div>
+
+  <!-- ===== MODAL: PRODUK ===== -->
+  <div id="productModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="productModalTitle">Tambah Produk</h2>
+        <button class="modal-close" id="closeProductModal">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="productForm">
+          <input type="hidden" id="productType">
+          <div class="form-group">
+            <label>Nama Produk *</label>
+            <input type="text" id="productName" placeholder="Contoh: Laptop Acer Aspire 5" required>
+          </div>
+          <div class="form-group">
+            <label>Foto Produk</label>
+            <div class="upload-area" id="uploadArea">
+              <input type="file" id="productImageFile" accept="image/*">
+              <div class="upload-icon"></div>
+              <p>Klik atau seret gambar ke sini<br><small>Maks. 5MB (JPG, PNG, WEBP)</small></p>
+            </div>
+            <img id="imgPreview" class="img-preview" alt="Preview gambar">
+          </div>
+          <div class="form-group">
+            <label>Harga (Opsional, kosongkan jika tidak ditampilkan)</label>
+            <input type="number" id="productPrice" placeholder="Contoh: 5500000">
+          </div>
+          <div class="form-group">
+            <label>Penjelasan Produk *</label>
+            <textarea id="productDesc" rows="3" placeholder="Deskripsi singkat tentang produk ini..."
+              required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Keunggulan Produk *</label>
+            <textarea id="productAdv" rows="3" placeholder="Apa yang membuat produk ini unggul?" required></textarea>
+          </div>
+          <!-- Khusus Laptop -->
+          <div id="laptopFields" style="display:none;">
+            <div class="form-group">
+              <label>Kategori Laptop *</label>
+              <select id="productLaptopCategory">
+                <option value="Pelajar"> Pelajar</option>
+                <option value="Kantoran"> Kantoran</option>
+                <option value="Gaming"> Gaming</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Spesifikasi Lengkap *</label>
+              <textarea id="productSpecs" rows="4"
+                placeholder="Contoh: CPU: Intel Core i5-1235U, RAM: 8GB DDR4, Storage: 512GB SSD..."></textarea>
+            </div>
+          </div>
+          <input type="hidden" id="currentImageUrl">
+          <div id="uploadProgress" style="display:none;font-size:0.85rem;color:var(--primary);margin-bottom:0.8rem;">
+            Mengupload gambar...</div>
+          <button type="submit" id="productFormSubmitBtn" class="btn btn-primary"
+            style="width:100%;padding:0.75rem;font-size:0.95rem;"> Simpan Data</button>
+        </form>
       </div>
     </div>
+  </div>
 
-    <!-- ===== DASHBOARD ===== -->
-    <!-- Overlay untuk mobile sidebar (di luar grid agar tidak merusak layout) -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
-    <div id="dashboardSection" class="dashboard-container" style="display:none;">
-
-      <!-- SIDEBAR -->
-      <aside class="admin-sidebar no-print">
-        <div class="admin-sidebar-header">
-          <div class="brand">Tech<span>Haven</span></div>
-          <p>Admin Panel</p>
-        </div>
-        <nav>
-          <ul>
-            <li><a href="#" id="navDashboard" class="active"><span class="icon">📊</span>Dashboard</a></li>
-            <div class="nav-section-label">Data Produk</div>
-            <li><a href="#" id="navLaptop"><span class="icon">💻</span>Data Laptop</a></li>
-            <li><a href="#" id="navPC"><span class="icon">🖥️</span>Data PC</a></li>
-            <li><a href="#" id="navSSD"><span class="icon">💾</span>Data SSD & RAM</a></li>
-            <li><a href="#" id="navCCTV"><span class="icon">📷</span>Data CCTV</a></li>
-            <div class="nav-section-label">SDM</div>
-            <li><a href="#" id="navEmployees"><span class="icon">👥</span>Data Karyawan</a></li>
-          </ul>
-        </nav>
-        <div class="admin-sidebar-footer">
-          <a href="#" id="navLogout">🚪 Keluar</a>
-        </div>
-      </aside>
-
-
-
-      <!-- MAIN CONTENT -->
-      <main class="admin-content">
-        <div class="admin-topbar no-print">
-          <div style="display:flex;align-items:center;gap:0.75rem;">
-            <button class="hamburger-btn" id="hamburgerBtn" aria-label="Buka menu">
-              <span></span><span></span><span></span>
-            </button>
-            <h1 id="pageTitle">Dashboard</h1>
+  <!-- ===== MODAL: KARYAWAN ===== -->
+  <div id="employeeModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="employeeModalTitle">Tambah Data Karyawan</h2>
+        <button class="modal-close" id="closeEmployeeModal">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="employeeForm">
+          <div class="form-group">
+            <label>Nama Lengkap Karyawan *</label>
+            <input type="text" id="empName" placeholder="Contoh: Ahmad Rizky" required>
           </div>
-          <span id="adminUser" style="font-size:0.85rem;color:var(--gray-500);">Admin</span>
-        </div>
-
-        <div class="admin-main">
-
-          <!-- DASHBOARD VIEW -->
-          <div id="viewDashboard">
-            <div class="stats-grid">
-              <div class="stat-card">
-                <div class="stat-card-icon blue">💻</div>
-                <div class="stat-card-info"><h4>Laptop</h4><p id="statLaptop">-</p></div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-card-icon blue">🖥️</div>
-                <div class="stat-card-info"><h4>PC Desktop</h4><p id="statPC">-</p></div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-card-icon green">💾</div>
-                <div class="stat-card-info"><h4>SSD & RAM</h4><p id="statSSD">-</p></div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-card-icon dark">📷</div>
-                <div class="stat-card-info"><h4>CCTV</h4><p id="statCCTV">-</p></div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-card-icon green">📦</div>
-                <div class="stat-card-info"><h4>Total Produk</h4><p id="statProducts">-</p></div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-card-icon dark">👥</div>
-                <div class="stat-card-info"><h4>Karyawan</h4><p id="statEmployees">-</p></div>
-              </div>
-            </div>
-            <div style="background:var(--white);border:1px solid var(--border);border-radius:12px;padding:2rem;text-align:center;color:var(--gray);">
-              <p style="font-size:1.5rem;margin-bottom:0.5rem;">👋</p>
-              <p>Selamat datang di Admin Panel TechHaven. Pilih menu di sebelah kiri untuk mengelola data.</p>
-            </div>
+          <div class="form-group">
+            <label>Posisi / Jabatan *</label>
+            <input type="text" id="empPosition" placeholder="Contoh: Teknisi, Sales, Kasir..." required>
           </div>
-
-          <!-- PRODUCTS VIEW -->
-          <div id="viewProducts" style="display:none;" class="printable">
-            <div class="print-header">
-              <h2 id="printTitleProducts">Laporan Data Produk</h2>
-              <p>TechHaven - Dicetak pada: <span id="printDate"></span></p>
-            </div>
-            <div class="view-section">
-              <div class="view-toolbar no-print">
-                <h3 id="productTableTitle">Data Produk</h3>
-                <div class="view-toolbar-actions">
-                  <button class="btn btn-primary" id="addProductBtn">+ Tambah Data</button>
-                  <button class="btn btn-dark no-print" id="printProductsBtn">🖨️ Cetak</button>
-                </div>
-              </div>
-              <table class="data-table">
-                <thead><tr id="productsTableHeader"></tr></thead>
-                <tbody id="productsTableBody"></tbody>
-              </table>
-            </div>
+          <div class="form-group">
+            <label>Nomor WhatsApp / Kontak</label>
+            <input type="text" id="empContact" placeholder="Contoh: 08123456789">
           </div>
-
-          <!-- EMPLOYEES VIEW -->
-          <div id="viewEmployees" style="display:none;" class="printable">
-            <div class="print-header">
-              <h2>Laporan Data Karyawan</h2>
-              <p>TechHaven - Dicetak pada: <span id="printDateEmp"></span></p>
-            </div>
-            <div class="view-section">
-              <div class="view-toolbar no-print">
-                <h3>Data Karyawan</h3>
-                <div class="view-toolbar-actions">
-                  <button class="btn btn-primary" id="addEmployeeBtn">+ Tambah Karyawan</button>
-                  <button class="btn btn-dark no-print" id="printEmployeesBtn">🖨️ Cetak</button>
-                </div>
-              </div>
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>No</th>
-                    <th>Nama Karyawan</th>
-                    <th>Posisi / Jabatan</th>
-                    <th>Kontak (WhatsApp)</th>
-                    <th class="no-print">Aksi</th>
-                  </tr>
-                </thead>
-                <tbody id="employeesTableBody"></tbody>
-              </table>
-            </div>
-          </div>
-
-        </div><!-- end admin-main -->
-      </main>
-    </div>
-
-    <!-- ===== MODAL: PRODUK ===== -->
-    <div id="productModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 id="productModalTitle">Tambah Produk</h2>
-          <button class="modal-close" id="closeProductModal">×</button>
-        </div>
-        <div class="modal-body">
-          <form id="productForm">
-            <input type="hidden" id="productType">
-            <div class="form-group">
-              <label>Nama Produk *</label>
-              <input type="text" id="productName" placeholder="Contoh: Laptop Acer Aspire 5" required>
-            </div>
-            <div class="form-group">
-              <label>Foto Produk</label>
-              <div class="upload-area" id="uploadArea">
-                <input type="file" id="productImageFile" accept="image/*">
-                <div class="upload-icon">📷</div>
-                <p>Klik atau seret gambar ke sini<br><small>Maks. 5MB (JPG, PNG, WEBP)</small></p>
-              </div>
-              <img id="imgPreview" class="img-preview" alt="Preview gambar">
-            </div>
-            <div class="form-group">
-              <label>Harga (Opsional, kosongkan jika tidak ditampilkan)</label>
-              <input type="number" id="productPrice" placeholder="Contoh: 5500000">
-            </div>
-            <div class="form-group">
-              <label>Penjelasan Produk *</label>
-              <textarea id="productDesc" rows="3" placeholder="Deskripsi singkat tentang produk ini..." required></textarea>
-            </div>
-            <div class="form-group">
-              <label>Keunggulan Produk *</label>
-              <textarea id="productAdv" rows="3" placeholder="Apa yang membuat produk ini unggul?" required></textarea>
-            </div>
-            <!-- Khusus Laptop -->
-            <div id="laptopFields" style="display:none;">
-              <div class="form-group">
-                <label>Kategori Laptop *</label>
-                <select id="productLaptopCategory">
-                  <option value="Pelajar">🎒 Pelajar</option>
-                  <option value="Kantoran">💼 Kantoran</option>
-                  <option value="Gaming">🎮 Gaming</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Spesifikasi Lengkap *</label>
-                <textarea id="productSpecs" rows="4" placeholder="Contoh: CPU: Intel Core i5-1235U, RAM: 8GB DDR4, Storage: 512GB SSD..."></textarea>
-              </div>
-            </div>
-            <input type="hidden" id="currentImageUrl">
-            <div id="uploadProgress" style="display:none;font-size:0.85rem;color:var(--primary);margin-bottom:0.8rem;">⏳ Mengupload gambar...</div>
-            <button type="submit" id="productFormSubmitBtn" class="btn btn-primary" style="width:100%;padding:0.75rem;font-size:0.95rem;">💾 Simpan Data</button>
-          </form>
-        </div>
+          <button type="submit" id="employeeFormSubmitBtn" class="btn btn-green"
+            style="width:100%;padding:0.75rem;font-size:0.95rem;"> Simpan Karyawan</button>
+        </form>
       </div>
     </div>
+  </div>
 
-    <!-- ===== MODAL: KARYAWAN ===== -->
-    <div id="employeeModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 id="employeeModalTitle">Tambah Data Karyawan</h2>
-          <button class="modal-close" id="closeEmployeeModal">×</button>
-        </div>
-        <div class="modal-body">
-          <form id="employeeForm">
-            <div class="form-group">
-              <label>Nama Lengkap Karyawan *</label>
-              <input type="text" id="empName" placeholder="Contoh: Ahmad Rizky" required>
-            </div>
-            <div class="form-group">
-              <label>Posisi / Jabatan *</label>
-              <input type="text" id="empPosition" placeholder="Contoh: Teknisi, Sales, Kasir..." required>
-            </div>
-            <div class="form-group">
-              <label>Nomor WhatsApp / Kontak</label>
-              <input type="text" id="empContact" placeholder="Contoh: 08123456789">
-            </div>
-            <button type="submit" id="employeeFormSubmitBtn" class="btn btn-green" style="width:100%;padding:0.75rem;font-size:0.95rem;">💾 Simpan Karyawan</button>
-          </form>
-        </div>
-      </div>
-    </div>
+  <script type="module" src="/src/admin.js"></script>
+</body>
 
-    <script type="module" src="/src/admin.js"></script>
-  </body>
 </html>
