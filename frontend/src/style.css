@@ -1015,9 +1015,35 @@ body.cursor-hover .cursor-ring {
   box-shadow: 0 8px 30px rgba(0,0,0,0.3);
 }
 
-.contact-card-icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
+.contact-card-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.6rem;
+  background: rgba(255,255,255,0.15);
+}
 .contact-card-label { font-size: 0.9rem; font-weight: 700; color: white; margin-bottom: 0.15rem; }
 .contact-card-sub   { font-size: 0.75rem; color: rgba(255,255,255,0.45); }
+
+/* Brand-specific contact card colors */
+.contact-card.wa  { background: linear-gradient(135deg, rgba(37,211,102,0.25), rgba(18,140,126,0.2)); border-color: rgba(37,211,102,0.35); }
+.contact-card.wa  .contact-card-icon { background: linear-gradient(135deg, #25D366, #128C7E); }
+.contact-card.wa:hover  { background: linear-gradient(135deg, rgba(37,211,102,0.38), rgba(18,140,126,0.3)); }
+
+.contact-card.ig  { background: linear-gradient(135deg, rgba(240,148,51,0.22), rgba(188,24,136,0.2)); border-color: rgba(220,39,67,0.3); }
+.contact-card.ig  .contact-card-icon { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+.contact-card.ig:hover  { background: linear-gradient(135deg, rgba(240,148,51,0.35), rgba(188,24,136,0.3)); }
+
+.contact-card.tt  { background: linear-gradient(135deg, rgba(0,0,0,0.3), rgba(105,201,208,0.12)); border-color: rgba(105,201,208,0.25); }
+.contact-card.tt  .contact-card-icon { background: linear-gradient(135deg, #010101, #69C9D0); }
+.contact-card.tt:hover  { background: linear-gradient(135deg, rgba(0,0,0,0.45), rgba(105,201,208,0.2)); }
+
+.contact-card.sp  { background: linear-gradient(135deg, rgba(238,77,45,0.22), rgba(255,130,0,0.18)); border-color: rgba(238,77,45,0.35); }
+.contact-card.sp  .contact-card-icon { background: linear-gradient(135deg, #EE4D2D, #FF8200); }
+.contact-card.sp:hover  { background: linear-gradient(135deg, rgba(238,77,45,0.35), rgba(255,130,0,0.28)); }
 
 /* ============ FOOTER ============ */
 .site-footer {
@@ -1333,6 +1359,28 @@ body.cursor-hover .cursor-ring {
 
 .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 
+.stat-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: white;
+}
+.stat-card-icon.blue  { background: linear-gradient(135deg, #6366F1, #4338CA); }
+.stat-card-icon.green { background: linear-gradient(135deg, #10B981, #059669); }
+.stat-card-icon.dark  { background: linear-gradient(135deg, #374151, #1C1C1E); }
+
+.stat-card {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 1rem;
+}
+.stat-card-info h4 { font-size: 0.75rem; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.15rem; }
+.stat-card-info p  { font-family: var(--font-head); font-size: 1.6rem; font-weight: 800; color: var(--charcoal); line-height: 1; }
+
 .stat-card-label { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gray-500); }
 .stat-card-value { font-family: var(--font-head); font-size: 2.2rem; font-weight: 800; color: var(--charcoal); line-height: 1; }
 .stat-card-sub   { font-size: 0.72rem; color: var(--gray-500); }
@@ -1552,7 +1600,7 @@ body.cursor-hover .cursor-ring {
 .upload-area:hover { border-color: var(--indigo); background: var(--indigo-light); }
 .upload-area input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; border: none; padding: 0; }
 .upload-area p { font-size: 0.8rem; color: var(--gray-500); }
-.upload-area .upload-icon { font-size: 2rem; margin-bottom: 0.3rem; }
+.upload-area .upload-icon { display: flex; align-items: center; justify-content: center; margin-bottom: 0.4rem; color: var(--gray-500); }
 
 .img-preview { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; margin-top: 0.7rem; display: none; }
 
