@@ -232,7 +232,8 @@ function openModal(p) {
       ${extraHtml}
       <div class="modal-divider"></div>
       <a href="${waLink}" target="_blank" class="modal-wa-btn">
-        💬 Tanya / Beli via WhatsApp
+        <img src="/icons/logo-whatsapp.png" alt="WhatsApp" class="modal-wa-icon">
+        Tanya / Beli via WhatsApp
       </a>
     </div>
   `;

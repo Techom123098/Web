@@ -1016,34 +1016,64 @@ body.cursor-hover .cursor-ring {
 }
 
 .contact-card-icon {
-  width: 54px;
-  height: 54px;
+  width: 56px;
+  height: 56px;
   border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 0.6rem;
-  background: rgba(255,255,255,0.15);
+  margin-bottom: 0.75rem;
+  background: transparent;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
 }
-.contact-card-label { font-size: 0.9rem; font-weight: 700; color: white; margin-bottom: 0.15rem; }
-.contact-card-sub   { font-size: 0.75rem; color: rgba(255,255,255,0.45); }
+
+.contact-card:hover .contact-card-icon {
+  transform: scale(1.08) translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.4);
+}
+
+.app-icon-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 14px;
+  display: block;
+}
+
+.btn-icon-wa {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.modal-wa-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.contact-card-label { font-size: 0.92rem; font-weight: 700; color: white; margin-bottom: 0.2rem; }
+.contact-card-sub   { font-size: 0.75rem; color: rgba(255,255,255,0.5); }
 
 /* Brand-specific contact card colors */
-.contact-card.wa  { background: linear-gradient(135deg, rgba(37,211,102,0.25), rgba(18,140,126,0.2)); border-color: rgba(37,211,102,0.35); }
-.contact-card.wa  .contact-card-icon { background: linear-gradient(135deg, #25D366, #128C7E); }
-.contact-card.wa:hover  { background: linear-gradient(135deg, rgba(37,211,102,0.38), rgba(18,140,126,0.3)); }
+.contact-card.wa  { background: linear-gradient(135deg, rgba(37,211,102,0.18), rgba(18,140,126,0.14)); border-color: rgba(37,211,102,0.35); }
+.contact-card.wa:hover  { background: linear-gradient(135deg, rgba(37,211,102,0.3), rgba(18,140,126,0.24)); border-color: rgba(37,211,102,0.55); }
 
-.contact-card.ig  { background: linear-gradient(135deg, rgba(240,148,51,0.22), rgba(188,24,136,0.2)); border-color: rgba(220,39,67,0.3); }
-.contact-card.ig  .contact-card-icon { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
-.contact-card.ig:hover  { background: linear-gradient(135deg, rgba(240,148,51,0.35), rgba(188,24,136,0.3)); }
+.contact-card.ig  { background: linear-gradient(135deg, rgba(240,148,51,0.18), rgba(188,24,136,0.16)); border-color: rgba(220,39,67,0.35); }
+.contact-card.ig:hover  { background: linear-gradient(135deg, rgba(240,148,51,0.3), rgba(188,24,136,0.26)); border-color: rgba(220,39,67,0.55); }
 
-.contact-card.tt  { background: linear-gradient(135deg, rgba(0,0,0,0.3), rgba(105,201,208,0.12)); border-color: rgba(105,201,208,0.25); }
-.contact-card.tt  .contact-card-icon { background: linear-gradient(135deg, #010101, #69C9D0); }
-.contact-card.tt:hover  { background: linear-gradient(135deg, rgba(0,0,0,0.45), rgba(105,201,208,0.2)); }
+.contact-card.tt  { background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(105,201,208,0.12)); border-color: rgba(105,201,208,0.3); }
+.contact-card.tt:hover  { background: linear-gradient(135deg, rgba(255,255,255,0.14), rgba(105,201,208,0.22)); border-color: rgba(105,201,208,0.5); }
 
-.contact-card.sp  { background: linear-gradient(135deg, rgba(238,77,45,0.22), rgba(255,130,0,0.18)); border-color: rgba(238,77,45,0.35); }
-.contact-card.sp  .contact-card-icon { background: linear-gradient(135deg, #EE4D2D, #FF8200); }
-.contact-card.sp:hover  { background: linear-gradient(135deg, rgba(238,77,45,0.35), rgba(255,130,0,0.28)); }
+.contact-card.sp  { background: linear-gradient(135deg, rgba(238,77,45,0.18), rgba(255,130,0,0.14)); border-color: rgba(238,77,45,0.35); }
+.contact-card.sp:hover  { background: linear-gradient(135deg, rgba(238,77,45,0.3), rgba(255,130,0,0.24)); border-color: rgba(238,77,45,0.55); }
 
 /* ============ FOOTER ============ */
 .site-footer {
